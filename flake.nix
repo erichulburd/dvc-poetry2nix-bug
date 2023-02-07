@@ -18,15 +18,45 @@
       {
         packages = {
           myapp = mkPoetryApplication { 
-            projectDir = self;
+            projectDir = ./.;
+            preferWheels = true;
             overrides = defaultPoetryOverrides.extend
               (self: super: {
                 dvc-http = super.dvc-http.overridePythonAttrs
                 (
                   old: {
-                    buildInputs = (old.buildInputs or [ ]) ++ [ super.setuptools super.setuptools-scm ];
+                    buildInputs = (old.buildInputs or [ ]) ++ [ super.setuptools super.setuptools-scm pkgs.libgit2 super.pdm-pep517 ];
+                    propagatedBuildInputs = builtins.filter (i: i.pname != "dvc") old.propagatedBuildInputs;
                   }
                 );
+                dvc = super.dvc.overridePythonAttrs
+                (
+                  old: {
+                    buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.libgit2 ];
+                  }
+                );
+                pygit2 = super.pygit2.overridePythonAttrs
+                (
+                  old: {
+                    buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.libgit2 ];
+                  }
+                );
+                hydra-core = super.hydra-core.overridePythonAttrs
+                (
+                  old: {
+                    buildInputs = (old.buildInputs or [ ]) ++ [ super.setuptools pkgs.openjdk11 ];
+                    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.openjdk11 ];
+                  }
+                );
+
+
+                flufl-lock = super.flufl-lock.overridePythonAttrs
+                (
+                  old: {
+                    buildInputs = (old.buildInputs or [ ]) ++ [ super.pdm-pep517 ];
+                  }
+                );
+
               });
           };
           default = self.packages.${system}.myapp;

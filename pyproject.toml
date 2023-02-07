@@ -9,6 +9,7 @@ packages = [{include = "dvc_poetry2nix_bug"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 dvc = {version = "2.18.1", extras = ["s3", "ssh"]}
+pathspec = "0.9.0"
 
 
 [build-system]
